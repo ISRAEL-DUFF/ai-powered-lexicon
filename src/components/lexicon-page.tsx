@@ -10,7 +10,8 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { DictionaryEntryDisplay } from '@/components/dictionary-entry-display';
 import { EntrySkeleton } from '@/components/entry-skeleton';
-import { Loader2, ScrollText, Sparkles } from 'lucide-react';
+import { Loader2, ScrollText, Sparkles, BookText } from 'lucide-react';
+import Link from 'next/link';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -64,16 +65,24 @@ export function LexiconPage() {
           <CardDescription>Enter an Ancient Greek word (e.g., λόγοις, ἀγαθός, ἔλεγον) to begin.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form action={formAction} className="flex flex-col gap-4 sm:flex-row">
-            <Input
-              name="word"
-              placeholder="e.g., λόγοις"
-              className="flex-grow text-lg"
-              lang="grc"
-              autoFocus
-            />
-            <SubmitButton />
-          </form>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <form action={formAction} className="flex flex-grow gap-4 sm:flex-row">
+                <Input
+                  name="word"
+                  placeholder="e.g., λόγοις"
+                  className="flex-grow text-lg"
+                  lang="grc"
+                  autoFocus
+                />
+                <SubmitButton />
+              </form>
+               <Button asChild variant="outline" className="w-full sm:w-auto mt-2 sm:mt-0">
+                  <Link href="/archive">
+                      <BookText className="mr-2" />
+                      View Archive
+                  </Link>
+              </Button>
+            </div>
         </CardContent>
       </Card>
 
