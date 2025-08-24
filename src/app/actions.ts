@@ -15,25 +15,19 @@ export interface FormState {
   timestamp: number;
 }
 
-export async function getDictionaryEntry(
-  prevState: FormState,
-  formData: FormData
-): Promise<FormState> {
-  try {
-    const validatedFields = formSchema.safeParse({
-      word: formData.get('word'),
-    });
-
-    if (!validatedFields.success) {
-      return {
-        data: null,
-        error: validatedFields.error.flatten().fieldErrors.word?.[0] || 'Invalid input.',
-        timestamp: Date.now(),
-      };
+/**
+ * Processes a word to get its dictionary entry, either from the database or by generating a new one.
+ * @param word The word to process.
+ * @returns The lexicon output.
+ */
+export async function processWord(word: string): Promise<LemmaConversionOutput> {
+    const validatedWord = z.string().min(1).safeParse(word);
+    if (!validatedWord.success) {
+        throw new Error('A valid word is required.');
     }
-    
+
     const supabase = createClient();
-    const submittedWord = validatedFields.data.word.trim();
+    const submittedWord = validatedWord.data.trim();
 
     // Check if the word already exists
     const { data: existingEntry, error: selectError } = await supabase
@@ -48,21 +42,17 @@ export async function getDictionaryEntry(
     }
     
     if (existingEntry) {
-      return { 
-        data: {
+      return {
           lemma: existingEntry.lemma,
           part_of_speech: existingEntry.part_of_speech,
           definition: existingEntry.definition,
           examples: existingEntry.examples,
           related: existingEntry.related,
-        }, 
-        error: null, 
-        timestamp: Date.now() 
       };
     }
 
     // If not, call the AI
-    const result = await lemmaConversion({ word: validatedFields.data.word });
+    const result = await lemmaConversion({ word: submittedWord });
     
     if (!result || !result.lemma) {
         throw new Error("The AI failed to generate a valid dictionary entry. Please try a different word.");
@@ -83,6 +73,28 @@ export async function getDictionaryEntry(
         console.error('Supabase insert error:', insertError.message);
     }
 
+    return result;
+}
+
+
+export async function getDictionaryEntry(
+  prevState: FormState,
+  formData: FormData
+): Promise<FormState> {
+  try {
+    const validatedFields = formSchema.safeParse({
+      word: formData.get('word'),
+    });
+
+    if (!validatedFields.success) {
+      return {
+        data: null,
+        error: validatedFields.error.flatten().fieldErrors.word?.[0] || 'Invalid input.',
+        timestamp: Date.now(),
+      };
+    }
+    
+    const result = await processWord(validatedFields.data.word);
 
     return { data: result, error: null, timestamp: Date.now() };
   } catch (error) {
