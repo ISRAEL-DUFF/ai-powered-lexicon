@@ -1,5 +1,5 @@
 
-import { createClient } from '@/lib/supabase';
+import { createClient, createBuildTimeClient } from '@/lib/supabase';
 import { notFound } from 'next/navigation';
 import { DictionaryEntryDisplay } from '@/components/dictionary-entry-display';
 import { Button } from '@/components/ui/button';
@@ -52,7 +52,8 @@ export default async function WordPage({ params }: WordPageProps) {
 }
 
 export async function generateStaticParams() {
-    const supabase = createClient();
+    // Use the build-time client here as cookies are not available.
+    const supabase = createBuildTimeClient();
     const { data: lexicon } = await supabase.from('lexicon').select('lemma');
     
     if (!lexicon) {

@@ -1,7 +1,9 @@
 
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 
+// This client is for Server Components and Server Actions, which have access to cookies.
 export function createClient() {
   const cookieStore = cookies()
 
@@ -34,4 +36,12 @@ export function createClient() {
       },
     }
   )
+}
+
+// This client is for build-time operations (like generateStaticParams) where cookies are not available.
+export function createBuildTimeClient() {
+    return createSupabaseClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    )
 }
