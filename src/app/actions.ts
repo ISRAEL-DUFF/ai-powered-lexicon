@@ -3,6 +3,7 @@
 
 import { z } from 'zod';
 import { lemmaConversion, type LemmaConversionOutput } from '@/ai/flows/lemma-conversion';
+import { createClient } from '@/lib/supabase';
 
 const formSchema = z.object({
   word: z.string().min(1, 'A word is required.'),
@@ -30,12 +31,58 @@ export async function getDictionaryEntry(
         timestamp: Date.now(),
       };
     }
+    
+    const supabase = createClient();
+    const submittedWord = validatedFields.data.word.trim();
 
+    // Check if the word already exists
+    const { data: existingEntry, error: selectError } = await supabase
+      .from('lexicon')
+      .select('*')
+      .or(`word.eq.${submittedWord},lemma.eq.${submittedWord}`)
+      .limit(1)
+      .single();
+
+    if (selectError && selectError.code !== 'PGRST116') { // Ignore 'single row not found'
+        throw new Error(selectError.message);
+    }
+    
+    if (existingEntry) {
+      return { 
+        data: {
+          lemma: existingEntry.lemma,
+          part_of_speech: existingEntry.part_of_speech,
+          definition: existingEntry.definition,
+          examples: existingEntry.examples,
+          related: existingEntry.related,
+        }, 
+        error: null, 
+        timestamp: Date.now() 
+      };
+    }
+
+    // If not, call the AI
     const result = await lemmaConversion({ word: validatedFields.data.word });
     
     if (!result || !result.lemma) {
         throw new Error("The AI failed to generate a valid dictionary entry. Please try a different word.");
     }
+    
+    // Save the new entry to the database
+    const { error: insertError } = await supabase.from('lexicon').insert({
+        word: submittedWord,
+        lemma: result.lemma,
+        part_of_speech: result.part_of_speech,
+        definition: result.definition,
+        examples: result.examples,
+        related: result.related,
+    });
+
+    if (insertError) {
+        // Log the error but don't block the user from seeing the result
+        console.error('Supabase insert error:', insertError.message);
+    }
+
 
     return { data: result, error: null, timestamp: Date.now() };
   } catch (error) {
