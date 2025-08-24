@@ -1,8 +1,8 @@
 
 'use client';
 
-import { useEffect } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useEffect, useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { getDictionaryEntry, type FormState } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -33,7 +33,7 @@ const initialState: FormState = {
 };
 
 export function LexiconPage() {
-  const [state, formAction] = useFormState(getDictionaryEntry, initialState);
+  const [state, formAction] = useActionState(getDictionaryEntry, initialState);
   const { toast } = useToast();
 
   useEffect(() => {
