@@ -43,14 +43,16 @@ export function LexiconPage() {
   // This effect handles the query parameter lookup
   useEffect(() => {
     const wordFromQuery = searchParams.get('word');
-    if (wordFromQuery) {
-        // Create a new FormData object and append the word
-        const formData = new FormData();
-        formData.append('word', wordFromQuery);
-        // Directly call the form action
-        formAction(formData);
+    const form = formRef.current;
+    if (wordFromQuery && form) {
+        // Set the input value and submit the form programmatically
+        const input = form.elements.namedItem('word') as HTMLInputElement;
+        if (input) {
+            input.value = wordFromQuery;
+        }
+        form.requestSubmit();
     }
-  }, [searchParams, formAction]);
+  }, [searchParams]);
 
 
   useEffect(() => {
