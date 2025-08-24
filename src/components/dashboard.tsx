@@ -75,32 +75,7 @@ export async function Dashboard() {
       <StatCards stats={stats} />
       <div className="text-center mt-12 text-sm text-muted-foreground">
         <p>This dashboard provides a real-time overview of your LexiconGraphikos database.</p>
-        <p>If you see errors or 'N/A', ensure you've run the SQL setup in your Supabase project.</p>
-        <div className="mt-4 p-4 bg-muted rounded-md text-left font-mono text-xs overflow-x-auto">
-          <p className="font-bold mb-2">SQL for `lexicon` table:</p>
-          <pre>{`CREATE TABLE lexicon (
-  id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-  created_at TIMESTAMPTZ DEFAULT now() NOT NULL,
-  word TEXT NOT NULL,
-  lemma TEXT NOT NULL,
-  part_of_speech TEXT NOT NULL,
-  definition TEXT NOT NULL,
-  examples TEXT[] NOT NULL,
-  related TEXT[] NOT NULL
-);`}</pre>
-          <p className="font-bold mt-4 mb-2">SQL for `get_most_frequent_pos` function:</p>
-          <pre>{`CREATE OR REPLACE FUNCTION get_most_frequent_pos()
-RETURNS TABLE(part_of_speech_val text, frequency bigint) AS $$
-BEGIN
-    RETURN QUERY
-    SELECT part_of_speech, COUNT(*) AS frequency
-    FROM lexicon
-    GROUP BY part_of_speech
-    ORDER BY frequency DESC
-    LIMIT 1;
-END;
-$$ LANGUAGE plpgsql;`}</pre>
-        </div>
+        <p>If you see errors or 'N/A', it may mean the database is still empty.</p>
       </div>
     </main>
   );
