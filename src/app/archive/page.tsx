@@ -2,6 +2,20 @@ import { ArchivePage } from '@/components/archive-page';
 import { createClient } from '@/lib/supabase';
 import { type LexiconEntry } from '@/lib/types';
 
+const greekNormalization = {
+  normalizeGreek: (lemma: string) =>{
+    return lemma
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^\p{Script=Greek}]/gu, "")
+      .toLowerCase();
+  },
+
+  normalizeLemma(lemma: string) {
+    return lemma.replace(/\d+$/, '');
+  }
+}
+
 export default async function Archive() {
   const supabase = createClient();
 
@@ -21,7 +35,8 @@ export default async function Archive() {
 
   // Group lemmas by the first letter
   const groupedLemmas = uniqueLemmas.reduce((acc, lemma) => {
-    const firstLetter = lemma.charAt(0).toUpperCase();
+    const lemmaWord = greekNormalization.normalizeGreek(lemma);
+    const firstLetter = lemmaWord.charAt(0).toUpperCase();
     if (!acc[firstLetter]) {
       acc[firstLetter] = [];
     }
