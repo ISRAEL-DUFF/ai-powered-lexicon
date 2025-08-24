@@ -1,8 +1,9 @@
 
 'use client';
 
-import { useEffect, useActionState } from 'react';
+import { useEffect, useActionState, useRef } from 'react';
 import { useFormStatus } from 'react-dom';
+import { useSearchParams } from 'next/navigation';
 import { getDictionaryEntry, type FormState } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -36,6 +37,21 @@ const initialState: FormState = {
 export function LexiconPage() {
   const [state, formAction] = useActionState(getDictionaryEntry, initialState);
   const { toast } = useToast();
+  const searchParams = useSearchParams();
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // This effect handles the query parameter lookup
+  useEffect(() => {
+    const wordFromQuery = searchParams.get('word');
+    if (wordFromQuery) {
+        // Create a new FormData object and append the word
+        const formData = new FormData();
+        formData.append('word', wordFromQuery);
+        // Directly call the form action
+        formAction(formData);
+    }
+  }, [searchParams, formAction]);
+
 
   useEffect(() => {
     if (state.error) {
@@ -66,13 +82,15 @@ export function LexiconPage() {
         </CardHeader>
         <CardContent>
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <form action={formAction} className="flex flex-grow gap-4 sm:flex-row">
+              <form ref={formRef} action={formAction} className="flex flex-grow gap-4 sm:flex-row">
                 <Input
                   name="word"
                   placeholder="e.g., λόγοις"
                   className="flex-grow text-lg"
                   lang="grc"
                   autoFocus
+                  // Use the query param as the default value
+                  defaultValue={searchParams.get('word') || ''}
                 />
                 <SubmitButton />
               </form>
