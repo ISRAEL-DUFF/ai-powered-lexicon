@@ -1,3 +1,4 @@
+
 'use client';
 
 import { ArrowLeft, BookText } from 'lucide-react';
@@ -39,9 +40,11 @@ export function ArchivePage({ groupedLemmas }: ArchivePageProps) {
             <CardContent>
               <div className="flex flex-wrap gap-3">
                 {groupedLemmas[letter].map((lemma) => (
-                   <Badge key={lemma} variant="secondary" className="text-base font-normal px-4 py-1.5">
-                    {lemma}
-                  </Badge>
+                   <Link href={`/word/${lemma}`} key={lemma}>
+                    <Badge variant="secondary" className="text-base font-normal px-4 py-1.5 hover:bg-primary/20 cursor-pointer">
+                      {lemma}
+                    </Badge>
+                  </Link>
                 ))}
               </div>
             </CardContent>
