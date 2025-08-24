@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { BookCopy, Quote, Link2 } from 'lucide-react';
+import Link from 'next/link';
 
 interface DictionaryEntryDisplayProps {
   data: LemmaConversionOutput;
@@ -50,9 +51,11 @@ export function DictionaryEntryDisplay({ data }: DictionaryEntryDisplayProps) {
           </h3>
           <div className="pl-9 flex flex-wrap gap-2">
             {data.related.map((word, index) => (
-              <Badge key={index} variant="secondary" className="text-base px-3 py-1">
-                {word}
-              </Badge>
+                <Link href={`/lexicon?word=${encodeURIComponent(word)}`} key={index}>
+                    <Badge variant="secondary" className="text-base px-3 py-1 hover:bg-primary/20 cursor-pointer">
+                        {word}
+                    </Badge>
+                </Link>
             ))}
           </div>
         </div>

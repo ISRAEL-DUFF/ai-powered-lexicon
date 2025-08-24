@@ -5,9 +5,10 @@ import { useMemo, useState } from 'react';
 import { Home, BookText, Search, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from './ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Input } from './ui/input';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+
 
 interface ArchivePageProps {
   groupedLemmas: Record<string, string[]>;
@@ -74,25 +75,27 @@ export function ArchivePage({ groupedLemmas }: ArchivePageProps) {
         />
       </div>
 
-      <div className="space-y-8">
+      <Accordion type="multiple" className="w-full space-y-4">
         {filteredSortedKeys.map((letter) => (
-          <Card key={letter}>
-            <CardHeader>
-              <CardTitle className="font-headline text-3xl text-primary/80">{letter}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-3">
+          <AccordionItem value={letter} key={letter} className="border-b-0">
+             <AccordionTrigger className="text-3xl font-headline text-primary/80 border rounded-md px-4 py-3 hover:no-underline hover:bg-secondary/50 data-[state=open]:rounded-b-none">
+              {letter}
+            </AccordionTrigger>
+            <AccordionContent className="border border-t-0 rounded-md rounded-t-none p-4">
+               <div className="flex flex-wrap gap-3">
                 {filteredGroupedLemmas[letter].map((lemma) => (
-                   <Link href={`/word/${lemma}`} key={lemma}>
+                   <Link href={`/word/${encodeURIComponent(lemma)}`} key={lemma}>
                     <Badge variant="secondary" className="text-base font-normal px-4 py-1.5 hover:bg-primary/20 cursor-pointer">
                       {lemma}
                     </Badge>
                   </Link>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </AccordionContent>
+          </AccordionItem>
         ))}
+        </Accordion>
+
         {filteredSortedKeys.length === 0 && (
              <div className="text-center py-16 px-4 rounded-lg border-2 border-dashed">
                 <h3 className="text-lg font-medium text-muted-foreground">
@@ -103,7 +106,6 @@ export function ArchivePage({ groupedLemmas }: ArchivePageProps) {
                 </p>
             </div>
         )}
-      </div>
     </main>
   );
 }
