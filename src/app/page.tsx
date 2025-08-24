@@ -1,5 +1,5 @@
-import { LexiconPage } from '@/components/lexicon-page';
+import { Dashboard } from '@/components/dashboard';
 
-export default function Home() {
-  return <LexiconPage />;
+export default async function DashboardPage() {
+  return <Dashboard />;
 }

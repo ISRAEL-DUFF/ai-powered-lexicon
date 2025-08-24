@@ -1,57 +1,81 @@
 
-'use client';
-
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "./ui/button";
+import { createClient } from "@/lib/supabase";
+import { BookUp, Library, MessageSquareQuote } from "lucide-react";
+import { StatCards } from "./stat-cards";
 import Link from "next/link";
-import { ArrowLeft, type LucideIcon } from "lucide-react";
+import { Button } from "./ui/button";
+import { BookText, ArrowRight } from "lucide-react";
 
-interface Stat {
-  title: string;
-  value: string | number;
-  icon: LucideIcon;
-  description: string;
-}
 
-interface DashboardProps {
-  stats: Stat[];
-}
+export async function Dashboard() {
+  const supabase = createClient();
 
-export function Dashboard({ stats }: DashboardProps) {
+  const { count: totalWords, error: totalWordsError } = await supabase
+    .from('lexicon')
+    .select('*', { count: 'exact', head: true });
+
+  const { data: latestWords, error: latestWordsError } = await supabase
+    .from('lexicon')
+    .select('lemma')
+    .order('created_at', { ascending: false })
+    .limit(5);
+
+  const { data: mostFrequent, error: mostFrequentError } = await supabase
+    .rpc('get_most_frequent_pos')
+    .limit(1)
+    .single();
+    
+  if (totalWordsError || latestWordsError || mostFrequentError) {
+    // Log errors but don't block the UI. The client component will handle the null state.
+    console.error(totalWordsError || latestWordsError || mostFrequentError);
+  }
+  
+  const stats = [
+    {
+      title: "Total Words in Lexicon",
+      value: totalWords ?? 0,
+      iconName: "Library" as const,
+      description: "The total number of unique dictionary entries.",
+    },
+    {
+      title: "Most Common Part of Speech",
+      value: mostFrequent?.part_of_speech_val || 'N/A',
+      iconName: "BookUp" as const,
+      description: "The most frequently occurring grammatical category.",
+    },
+    {
+        title: "Latest Additions",
+        value: latestWords?.map(w => w.lemma).join(', ') || 'N/A',
+        iconName: "MessageSquareQuote" as const,
+        description: "The most recently added words to the lexicon.",
+    }
+  ];
+  
   return (
     <main className="container mx-auto max-w-4xl px-4 py-8 md:py-12">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
             <h1 className="text-4xl font-bold tracking-tight font-headline text-primary/90 sm:text-5xl">
               Dashboard
             </h1>
-            <Button asChild variant="outline">
-                <Link href="/">
-                    <ArrowLeft className="mr-2" />
-                    Back to Lexicon
-                </Link>
-            </Button>
+             <div className="flex gap-2">
+                <Button asChild>
+                    <Link href="/lexicon">
+                        Go to Lexicon
+                        <ArrowRight className="mr-2" />
+                    </Link>
+                </Button>
+                <Button asChild variant="outline">
+                    <Link href="/archive">
+                        <BookText className="mr-2" />
+                        View Archive
+                    </Link>
+                </Button>
+            </div>
         </div>
-      <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-3">
-        {stats.map((stat) => (
-          <Card key={stat.title}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                {stat.title}
-              </CardTitle>
-              <stat.icon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground pt-2">
-                {stat.description}
-              </p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <StatCards stats={stats} />
       <div className="text-center mt-12 text-sm text-muted-foreground">
         <p>This dashboard provides a real-time overview of your LexiconGraphikos database.</p>
-        <p>You need to create the table and function in your Supabase project.</p>
+        <p>If you see errors or 'N/A', ensure you've run the SQL setup in your Supabase project.</p>
         <div className="mt-4 p-4 bg-muted rounded-md text-left font-mono text-xs overflow-x-auto">
           <p className="font-bold mb-2">SQL for `lexicon` table:</p>
           <pre>{`CREATE TABLE lexicon (

@@ -2,7 +2,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { ArrowLeft, BookText, Search } from 'lucide-react';
+import { Home, BookText, Search, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
@@ -47,12 +47,20 @@ export function ArchivePage({ groupedLemmas }: ArchivePageProps) {
               Lexicon Archive
             </h1>
         </div>
-        <Button asChild variant="outline">
-          <Link href="/">
-            <ArrowLeft className="mr-2" />
-            Back to Generator
-          </Link>
-        </Button>
+        <div className="flex gap-2">
+            <Button asChild variant="outline">
+                <Link href="/">
+                    <Home className="mr-2" />
+                    Dashboard
+                </Link>
+            </Button>
+            <Button asChild variant="outline">
+                <Link href="/lexicon">
+                    <ArrowLeft className="mr-2" />
+                    Back to Generator
+                </Link>
+            </Button>
+        </div>
       </div>
 
        <div className="mb-8 relative">
