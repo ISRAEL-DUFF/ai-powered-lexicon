@@ -5,6 +5,7 @@ import { DictionaryEntryDisplay } from '@/components/dictionary-entry-display';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+import { RegenerateButton } from '@/components/regenerate-button';
 
 interface WordPageProps {
   params: {
@@ -38,13 +39,14 @@ export default async function WordPage({ params }: WordPageProps) {
 
   return (
     <main className="container mx-auto max-w-4xl px-4 py-8 md:py-12">
-        <div className="mb-8">
+        <div className="mb-8 flex justify-between items-center">
             <Button asChild variant="outline">
                 <Link href="/archive">
                     <ArrowLeft className="mr-2" />
                     Back to Archive
                 </Link>
             </Button>
+            <RegenerateButton lemma={decodedLemma} />
         </div>
       <DictionaryEntryDisplay data={dictionaryEntry} />
     </main>
