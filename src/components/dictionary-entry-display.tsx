@@ -25,7 +25,7 @@ export function DictionaryEntryDisplay({ data }: DictionaryEntryDisplayProps) {
             <BookCopy className="mr-3 h-6 w-6 text-accent" />
             <span>Ορισμός (Definition)</span>
           </h3>
-          <p className="pl-9 text-lg leading-relaxed">{data.definition}</p>
+          <p className="pl-9 text-lg leading-relaxed whitespace-pre-line">{data.definition}</p>
         </div>
 
         <Separator />
