@@ -164,3 +164,52 @@ export async function regenerateEntry(lemma: string): Promise<{ error?: string }
         return { error: errorMessage };
     }
 }
+
+const updateSchema = z.object({
+  id: z.coerce.number(),
+  definition: z.string(),
+  examples: z.string().transform(val => val.split('\n').filter(Boolean)),
+  related: z.string().transform(val => val.split(',').map(s => s.trim()).filter(Boolean)),
+});
+
+export async function updateEntry(formData: FormData): Promise<{ error?: string }> {
+    try {
+        const validatedFields = updateSchema.safeParse({
+            id: formData.get('id'),
+            definition: formData.get('definition'),
+            examples: formData.get('examples'),
+            related: formData.get('related'),
+        });
+
+        if (!validatedFields.success) {
+            console.error(validatedFields.error.flatten());
+            throw new Error('Invalid data provided for update.');
+        }
+        
+        const { id, definition, examples, related } = validatedFields.data;
+
+        const supabase = createClient();
+        const { error } = await supabase
+            .from('lexicon')
+            .update({ definition, examples, related })
+            .eq('id', id);
+
+        if (error) {
+            throw new Error(`Failed to update entry: ${error.message}`);
+        }
+
+        const { data: entry } = await supabase.from('lexicon').select('lemma').eq('id', id).single();
+        if (entry) {
+            revalidatePath(`/word/${encodeURIComponent(entry.lemma)}`);
+            revalidatePath('/archive');
+        }
+
+
+        return {};
+
+    } catch (error) {
+        console.error('Error in updateEntry:', error);
+        const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
+        return { error: errorMessage };
+    }
+}
