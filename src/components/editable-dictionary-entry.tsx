@@ -14,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { BookCopy, Quote, Link2, Pencil, Save, X, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { CopyWordsButton } from './copy-words-button';
 
 interface EditableDictionaryEntryProps {
   entry: LexiconEntry;
@@ -111,10 +112,13 @@ export function EditableDictionaryEntry({ entry }: EditableDictionaryEntryProps)
                 <CardTitle className="font-headline text-5xl text-primary">{entry.lemma}</CardTitle>
                 <CardDescription className="text-accent-foreground font-semibold text-lg">{entry.part_of_speech}</CardDescription>
             </div>
-            <Button onClick={() => setIsEditing(true)} variant="outline">
-                <Pencil className="mr-2" />
-                Edit
-            </Button>
+            <div className="flex items-center gap-2">
+                <CopyWordsButton lemma={entry.lemma} related={entry.related} />
+                <Button onClick={() => setIsEditing(true)} variant="outline">
+                    <Pencil className="mr-2" />
+                    Edit
+                </Button>
+            </div>
         </CardHeader>
         <CardContent className="space-y-6">
             <Separator />

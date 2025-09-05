@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { BookCopy, Quote, Link2 } from 'lucide-react';
 import Link from 'next/link';
+import { CopyWordsButton } from './copy-words-button';
 
 interface DictionaryEntryDisplayProps {
   data: LemmaConversionOutput;
@@ -13,9 +14,12 @@ interface DictionaryEntryDisplayProps {
 export function DictionaryEntryDisplay({ data }: DictionaryEntryDisplayProps) {
   return (
     <Card className="shadow-lg animate-in fade-in duration-500">
-      <CardHeader className="text-center">
-        <CardTitle className="font-headline text-5xl text-primary">{data.lemma}</CardTitle>
-        <CardDescription className="text-accent-foreground font-semibold text-lg">{data.part_of_speech}</CardDescription>
+      <CardHeader className="flex flex-row items-center justify-between text-center">
+        <div>
+            <CardTitle className="font-headline text-5xl text-primary">{data.lemma}</CardTitle>
+            <CardDescription className="text-accent-foreground font-semibold text-lg">{data.part_of_speech}</CardDescription>
+        </div>
+        <CopyWordsButton lemma={data.lemma} related={data.related} />
       </CardHeader>
       <CardContent className="space-y-6">
         <Separator />
