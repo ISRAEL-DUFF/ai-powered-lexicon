@@ -226,7 +226,7 @@ export async function findEntriesRelatedTo(word: string): Promise<{ data?: Lexic
     const { data, error } = await supabase
       .from('lexicon')
       .select('*')
-      .contains('related', `{${validatedWord.data}}`);
+      .contains('related', `["${validatedWord.data}"]`);
 
     if (error) {
       throw new Error(`Failed to fetch related entries: ${error.message}`);
