@@ -12,9 +12,10 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { BookCopy, Quote, Link2, Pencil, Save, X, Loader2 } from 'lucide-react';
+import { BookCopy, Quote, Link2, Pencil, Save, X, Loader2, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { CopyWordsButton } from './copy-words-button';
+import { RegenerateButton } from './regenerate-button';
 
 interface EditableDictionaryEntryProps {
   entry: LexiconEntry;
@@ -53,18 +54,35 @@ export function EditableDictionaryEntry({ entry }: EditableDictionaryEntryProps)
         }
     });
   };
+  
+  const headerActions = (
+    <div className="flex flex-col sm:flex-row gap-2 items-center">
+        <Button asChild variant="outline" size="sm">
+            <Link href="/archive">
+                <ArrowLeft />
+                Back to Archive
+            </Link>
+        </Button>
+        <CopyWordsButton lemma={entry.lemma} related={entry.related} />
+        <RegenerateButton lemma={entry.lemma} />
+        <Button onClick={() => setIsEditing(true)} variant="outline" size="sm">
+            <Pencil />
+            Edit
+        </Button>
+    </div>
+  );
 
   if (isEditing) {
     return (
       <form action={handleFormAction}>
         <input type="hidden" name="id" value={entry.id} />
         <Card className="shadow-lg animate-in fade-in duration-500">
-            <CardHeader className="flex flex-row justify-between items-start text-center">
+            <CardHeader className="flex flex-col sm:flex-row justify-between items-start text-center sm:text-left gap-4">
                 <div>
                     <CardTitle className="font-headline text-5xl text-primary">{entry.lemma}</CardTitle>
                     <CardDescription className="text-accent-foreground font-semibold text-lg">{entry.part_of_speech}</CardDescription>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 self-center sm:self-auto">
                     <EditSubmitButton />
                     <Button type="button" variant="outline" onClick={() => setIsEditing(false)} disabled={isPending}>
                         <X className="mr-2" />
@@ -107,17 +125,13 @@ export function EditableDictionaryEntry({ entry }: EditableDictionaryEntryProps)
 
   return (
     <Card className="shadow-lg animate-in fade-in duration-500">
-        <CardHeader className="flex flex-row justify-between items-start text-center">
+        <CardHeader className="flex flex-col sm:flex-row justify-between items-start text-center sm:text-left gap-4">
             <div>
                 <CardTitle className="font-headline text-5xl text-primary">{entry.lemma}</CardTitle>
                 <CardDescription className="text-accent-foreground font-semibold text-lg">{entry.part_of_speech}</CardDescription>
             </div>
-            <div className="flex items-center gap-2">
-                <CopyWordsButton lemma={entry.lemma} related={entry.related} />
-                <Button onClick={() => setIsEditing(true)} variant="outline">
-                    <Pencil className="mr-2" />
-                    Edit
-                </Button>
+            <div className="flex items-center gap-2 self-center sm:self-auto">
+                {headerActions}
             </div>
         </CardHeader>
         <CardContent className="space-y-6">
