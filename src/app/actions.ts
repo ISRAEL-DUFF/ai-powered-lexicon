@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { lemmaConversion, type LemmaConversionOutput } from '@/ai/flows/lemma-conversion';
 import { createClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
+import type { LexiconEntry } from '@/lib/types';
 
 const formSchema = z.object({
   word: z.string().min(1, 'A word is required.'),
@@ -212,4 +213,29 @@ export async function updateEntry(formData: FormData): Promise<{ error?: string 
         const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
         return { error: errorMessage };
     }
+}
+
+export async function findEntriesRelatedTo(word: string): Promise<{ data?: LexiconEntry[]; error?: string }> {
+  try {
+    const validatedWord = z.string().min(1).safeParse(word);
+    if (!validatedWord.success) {
+      throw new Error('A valid word is required.');
+    }
+
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('lexicon')
+      .select('*')
+      .contains('related', [validatedWord.data]);
+
+    if (error) {
+      throw new Error(`Failed to fetch related entries: ${error.message}`);
+    }
+
+    return { data: data as LexiconEntry[] };
+  } catch (error) {
+    console.error('Error in findEntriesRelatedTo:', error);
+    const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
+    return { error: errorMessage };
+  }
 }

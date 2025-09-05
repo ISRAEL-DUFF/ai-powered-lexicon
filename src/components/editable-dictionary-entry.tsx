@@ -16,6 +16,8 @@ import { BookCopy, Quote, Link2, Pencil, Save, X, Loader2, ArrowLeft } from 'luc
 import Link from 'next/link';
 import { CopyWordsButton } from './copy-words-button';
 import { RegenerateButton } from './regenerate-button';
+import { FindRelatedButton } from './find-related-button';
+
 
 interface EditableDictionaryEntryProps {
   entry: LexiconEntry;
@@ -64,6 +66,7 @@ export function EditableDictionaryEntry({ entry }: EditableDictionaryEntryProps)
             </Link>
         </Button>
         <CopyWordsButton lemma={entry.lemma} related={entry.related} />
+        <FindRelatedButton lemma={entry.lemma} />
         <RegenerateButton lemma={entry.lemma} />
         <Button onClick={() => setIsEditing(true)} variant="outline" size="sm">
             <Pencil />
