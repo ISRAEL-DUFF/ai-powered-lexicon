@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import { regenerateEntry } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
@@ -34,11 +34,11 @@ export function RegenerateButton({ lemma }: RegenerateButtonProps) {
     };
 
     return (
-        <Button onClick={handleClick} disabled={isPending}>
+        <Button onClick={handleClick} disabled={isPending} variant="outline" size="sm">
             {isPending ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="animate-spin" />
             ) : (
-                <Sparkles className="mr-2 h-4 w-4" />
+                <Sparkles />
             )}
             Regenerate
         </Button>
