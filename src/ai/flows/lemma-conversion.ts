@@ -46,6 +46,9 @@ You will receive an Ancient Greek word, which may be an inflected form. Your tas
     "definition": "<definition written only in Greek, using synonyms, periphrases, or explanations, no English>",
     "examples": [
       "<short Ancient Greek example sentence>",
+      "<another Ancient Greek example sentence>",
+      "<another Ancient Greek example sentence>",
+      "<another Ancient Greek example sentence>",
       "<another Ancient Greek example sentence>"
     ],
     "related": ["<list of related Greek words>"]
